@@ -1,6 +1,8 @@
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react'
 import './App.css'
 import Sidebar from './components/Sidebar'
+import ChatBox from './components/ChatBox'
+
 
 function App() {
   return (
@@ -18,8 +20,10 @@ function App() {
             <UserButton />
           </SignedIn>
         </header>
-        <main className="main-content">
-          <h1 className="welcome-message">Welcome to LoanFit Copilot</h1>
+          <main className="main-content">
+            <h1 className="welcome-message">Welcome Back, John!</h1>
+            <ChatBox />
+          {/* <h1 className="welcome-message">Welcome to LoanFit Copilot</h1> */}
         </main>
       </div>
     </div>
