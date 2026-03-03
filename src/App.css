@@ -48,3 +48,24 @@
   background-clip: text;
   color: transparent;
 }
+
+.main-layout {
+  display: flex;
+  height: 100vh;
+}
+
+.auth-error-banner {
+  padding: 10px;
+  background-color: #ffebee;
+  color: #c62828;
+  text-align: center;
+  margin: 10px;
+  border-radius: 5px;
+  border: 1px solid #ef9a9a;
+}
+
+.login-hint {
+  padding: 10px;
+  text-align: center;
+  margin: 10px;
+}
