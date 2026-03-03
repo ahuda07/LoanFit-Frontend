@@ -1,16 +1,61 @@
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Mic } from "lucide-react"
 import "./ChatBox.css"
 
 export default function ChatHomeInput() {
   const [value, setValue] = useState("")
   const [messages, setMessages] = useState<{ role: string, content: string }[]>([])
+  const [isListening, setIsListening] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const recognitionRef = useRef<any>(null)
+
+  // Initialize Speech Recognition
+  useEffect(() => {
+    const SpeechRecognition =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition
+
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition()
+      recognition.continuous = false
+      recognition.interimResults = false
+      recognition.lang = "en-US"
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript
+        setValue((prev) => prev + " " + transcript)
+      }
+
+      recognition.onend = () => {
+        setIsListening(false)
+      }
+
+      recognitionRef.current = recognition
+    }
+  }, [])
+
+  const handleMicClick = () => {
+    if (!recognitionRef.current) {
+      alert("Speech Recognition not supported in this browser.")
+      return
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop()
+      setIsListening(false)
+    } else {
+      recognitionRef.current.start()
+      setIsListening(true)
+    }
+  }
 
   const handleFileClick = () => { fileInputRef.current?.click() }
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      setSelectedFile(file)
       console.log("Mock upload file:", file.name)
     }
   }
@@ -60,16 +105,45 @@ export default function ChatHomeInput() {
         ))}
       </div>
       <form className="chat-home-container" onSubmit={handleSubmit}>
-        <div className="chat-home-input-wrapper">
-          <button type="button" onClick={handleFileClick}>+</button>
-          <input
-            type="text"
-            placeholder="Ask anything"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            className="chat-home-input"
-          />
-          <button type="button" className="icon-button"><Mic size={18} /></button>
+        <div className={`chat-home-input-wrapper ${selectedFile ? "expanded" : ""}`}>
+
+          {selectedFile && (
+            <div className="file-preview-inline">
+              <div className="file-icon">PDF</div>
+              <div className="file-info">
+                <div className="file-name">{selectedFile.name}</div>
+                <div className="file-type">PDF</div>
+              </div>
+
+              <button
+                type="button"
+                className="remove-file"
+                onClick={() => setSelectedFile(null)}
+              >
+                x
+              </button>
+            </div>
+          )}
+
+          <div className="input-row">
+            <button type="button" onClick={handleFileClick}>+</button>
+            <input
+              type="text"
+              placeholder="Ask anything"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              className="chat-home-input"
+            />
+
+            <button
+              type="button"
+              className={`icon-button ${isListening ? "listening" : ""}`}
+              onClick={handleMicClick}
+            >
+              <Mic size={18} />
+            </button>
+          </div>
+
         </div>
         <input
           type="file"
