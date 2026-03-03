@@ -93,6 +93,12 @@ export default function Sidebar() {
           fontSize: "14px",
           color: "white", 
         }}
+        onMouseEnter={(e) =>
+          (e.currentTarget.style.backgroundColor = "#212121")
+        }
+        onMouseLeave={(e) =>
+          (e.currentTarget.style.backgroundColor = "#313131")
+        }
       >
       <FiPlus /> New Chat
       </button>
@@ -106,7 +112,14 @@ export default function Sidebar() {
           padding: "6px 10px",
           borderRadius: "6px",
           marginBottom: "15px",
+          
         }}
+        onMouseEnter={(e) =>
+          (e.currentTarget.style.backgroundColor = "#212121")
+        }
+        onMouseLeave={(e) =>
+          (e.currentTarget.style.backgroundColor = "#313131")
+        }
       >
         <FiSearch style={{ marginRight: "6px" }} />
         <input
