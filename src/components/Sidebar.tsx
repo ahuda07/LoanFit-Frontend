@@ -1,39 +1,64 @@
 import { useState } from "react";
-import { FiPlus, FiSearch, FiX } from "react-icons/fi";
+import { FiPlus, FiSearch, FiX, FiMenu } from "react-icons/fi";
 import logo from "./Logo.png";
 
 export default function Sidebar() {
   const [open, setOpen] = useState(true);
+  const [hovered, setHovered] = useState(false);
 
-  const chats = [
-    "John",
-    "Matt",
-    "Chris",
-    "Jacob",
-  ];
+  const chats = ["John", "Matt", "Chris", "Jacob"];
 
+  // Collapsed view
   if (!open) {
     return (
-      <button
-        onClick={() => setOpen(true)}
+      <div
         style={{
           position: "fixed",
-          top: 20,
-          left: 20,
+          top: 10,
+          left: 10,
           zIndex: 1000,
-          padding: "10px",
-          borderRadius: "6px",
-          backgroundColor: "#313131",
-          color: "white",
-          border: "none",
+          width: "40px",
+          height: "40px",
           cursor: "pointer",
         }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onClick={() => setOpen(true)}
       >
-        ☰
-      </button>
+        {/* Logo hidden when hovered */}
+        {!hovered && (
+          <img
+            src={logo}
+            alt="Logo"
+            style={{ width: "40px", height: "auto", display: "block" }}
+          />
+        )}
+
+        {/* Hamburger on hover */}
+        {hovered && (
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "40px",
+              height: "40px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "6px",
+              color: "white",
+              fontSize: "20px",
+            }}
+          >
+            <FiMenu />
+          </div>
+        )}
+      </div>
     );
   }
 
+  // Full sidebar
   return (
     <div
       style={{
@@ -86,21 +111,17 @@ export default function Sidebar() {
           gap: "8px",
           padding: "10px",
           marginBottom: "15px",
-          backgroundColor: "#313131", 
-          border: "none",   
+          backgroundColor: "#313131",
+          border: "none",
           borderRadius: "6px",
           cursor: "pointer",
           fontSize: "14px",
-          color: "white", 
+          color: "white",
         }}
-        onMouseEnter={(e) =>
-          (e.currentTarget.style.backgroundColor = "#212121")
-        }
-        onMouseLeave={(e) =>
-          (e.currentTarget.style.backgroundColor = "#313131")
-        }
+        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#212121")}
+        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#313131")}
       >
-      <FiPlus /> New Chat
+        <FiPlus /> New Chat
       </button>
 
       {/* Search */}
@@ -108,17 +129,12 @@ export default function Sidebar() {
         style={{
           display: "flex",
           alignItems: "center",
-        //   backgroundColor: "#212121",
           padding: "6px 10px",
           borderRadius: "6px",
           marginBottom: "15px",
         }}
-        onMouseEnter={(e) =>
-          (e.currentTarget.style.backgroundColor = "#212121")
-        }
-        onMouseLeave={(e) =>
-          (e.currentTarget.style.backgroundColor = "#313131")
-        }
+        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#212121")}
+        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#313131")}
       >
         <FiSearch style={{ marginRight: "6px" }} />
         <input
@@ -135,13 +151,7 @@ export default function Sidebar() {
       </div>
 
       {/* Chat List */}
-      <div
-        style={{
-          flex: 1,
-          overflowY: "auto",
-          paddingRight: "4px",
-        }}
-      >
+      <div style={{ flex: 1, overflowY: "auto", paddingRight: "4px" }}>
         <p style={{ fontSize: "12px", opacity: 0.6, marginBottom: "6px" }}>
           Your Chats
         </p>
@@ -157,12 +167,8 @@ export default function Sidebar() {
               backgroundColor: "#313131",
               transition: "background 0.2s",
             }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor = "#212121")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = "#313131")
-            }
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#212121")}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#313131")}
           >
             {chat}
           </div>

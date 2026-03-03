@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import './App.css'
 import Sidebar from './components/Sidebar'
 import ChatBox from './components/ChatBox'
-
+import logo from './components/Logo.png'
 
 function App() {
   const { isLoaded, isSignedIn, user } = useUser();
@@ -38,7 +38,22 @@ function App() {
 
   return (
     <div className="main-layout">
-      <Sidebar />
+      {/* Sidebar only when signed in */}
+      {isSignedIn && <Sidebar />}
+
+      {/* Small logo in top-left when signed out */}
+      {!isSignedIn && (
+        <div
+          style={{
+            position: "fixed",
+            top: 10,
+            left: 10,
+            zIndex: 1000,
+          }}
+        >
+          <img src={logo} alt="Logo" style={{ width: "40px", height: "auto" }} />
+        </div>
+      )}
 
       <div className="app-container" style={{ flex: 1 }}>
         {authError && (
@@ -51,9 +66,7 @@ function App() {
             <SignInButton mode="modal">
               <button
                 className="login-button"
-                onClick={() => {
-                  setAuthError("");
-                }}
+                onClick={() => setAuthError("")}
               >
                 Login
               </button>
