@@ -112,7 +112,6 @@ export default function Sidebar() {
           padding: "6px 10px",
           borderRadius: "6px",
           marginBottom: "15px",
-          
         }}
         onMouseEnter={(e) =>
           (e.currentTarget.style.backgroundColor = "#212121")
