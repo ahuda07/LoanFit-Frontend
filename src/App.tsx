@@ -10,11 +10,7 @@ function App() {
   const { isLoaded, isSignedIn, user } = useUser();
   const { signOut } = useAuth();
   const [authError, setAuthError] = useState("");
-
-  // Trigger used to reset chat
   const [newChatTrigger, setNewChatTrigger] = useState(0);
-
-  // Hover state for logo button
   const [logoHovered, setLogoHovered] = useState(false);
 
   useEffect(() => {
@@ -50,12 +46,10 @@ function App() {
   return (
     <div className="main-layout">
 
-      {/* Sidebar only when signed in */}
       {isSignedIn && (
         <Sidebar onNewChat={() => setNewChatTrigger(prev => prev + 1)} />
       )}
 
-      {/* Clickable logo when signed out */}
       {!isSignedIn && (
         <div
           style={{

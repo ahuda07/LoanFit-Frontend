@@ -11,14 +11,12 @@ export default function ChatHomeInput({ newChatTrigger }: { newChatTrigger: numb
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const recognitionRef = useRef<any>(null)
 
-  // Reset chat when "New Chat" is clicked
   useEffect(() => {
     setMessages([])
     setValue("")
     setSelectedFile(null)
   }, [newChatTrigger])
 
-  // Initialize Speech Recognition
   useEffect(() => {
     const SpeechRecognition =
       (window as any).SpeechRecognition ||
@@ -77,7 +75,6 @@ export default function ChatHomeInput({ newChatTrigger }: { newChatTrigger: numb
     const userMessage = value
     setValue("")
 
-    // Add user + placeholder agent message together
     setMessages(prev => [
       ...prev,
       { role: "user", content: userMessage },
