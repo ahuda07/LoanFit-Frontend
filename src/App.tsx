@@ -1,5 +1,6 @@
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser, useAuth } from '@clerk/clerk-react'
 import { useEffect, useState } from 'react'
+import { FiPlus } from "react-icons/fi"
 import './App.css'
 import Sidebar from './components/Sidebar'
 import ChatBox from './components/ChatBox'
@@ -9,6 +10,12 @@ function App() {
   const { isLoaded, isSignedIn, user } = useUser();
   const { signOut } = useAuth();
   const [authError, setAuthError] = useState("");
+
+  // Trigger used to reset chat
+  const [newChatTrigger, setNewChatTrigger] = useState(0);
+
+  // Hover state for logo button
+  const [logoHovered, setLogoHovered] = useState(false);
 
   useEffect(() => {
     const storedError = sessionStorage.getItem('clerkAuthError');
@@ -34,14 +41,21 @@ function App() {
     }
   }, [isLoaded, isSignedIn, user, signOut]);
 
-  const isUnauthorized = isSignedIn && user && user.primaryEmailAddress?.emailAddress && !user.primaryEmailAddress.emailAddress.endsWith('@uci.edu');
+  const isUnauthorized =
+    isSignedIn &&
+    user &&
+    user.primaryEmailAddress?.emailAddress &&
+    !user.primaryEmailAddress.emailAddress.endsWith('@uci.edu');
 
   return (
     <div className="main-layout">
-      {/* Sidebar only when signed in */}
-      {isSignedIn && <Sidebar />}
 
-      {/* Small logo in top-left when signed out */}
+      {/* Sidebar only when signed in */}
+      {isSignedIn && (
+        <Sidebar onNewChat={() => setNewChatTrigger(prev => prev + 1)} />
+      )}
+
+      {/* Clickable logo when signed out */}
       {!isSignedIn && (
         <div
           style={{
@@ -49,9 +63,28 @@ function App() {
             top: 10,
             left: 10,
             zIndex: 1000,
+            width: "40px",
+            height: "40px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
           }}
+          onClick={() => setNewChatTrigger(prev => prev + 1)}
+          onMouseEnter={() => setLogoHovered(true)}
+          onMouseLeave={() => setLogoHovered(false)}
         >
-          <img src={logo} alt="Logo" style={{ width: "40px", height: "auto" }} />
+          {!logoHovered && (
+            <img
+              src={logo}
+              alt="Logo"
+              style={{ width: "40px", height: "auto" }}
+            />
+          )}
+
+          {logoHovered && (
+            <FiPlus size={22} color="white" />
+          )}
         </div>
       )}
 
@@ -61,6 +94,7 @@ function App() {
             {authError}
           </div>
         )}
+
         <header className="app-header">
           <SignedOut>
             <SignInButton mode="modal">
@@ -72,15 +106,19 @@ function App() {
               </button>
             </SignInButton>
           </SignedOut>
+
           <SignedIn>
             {!isUnauthorized && <UserButton />}
           </SignedIn>
         </header>
 
-        {(!isUnauthorized) && (
+        {!isUnauthorized && (
           <main className="main-content">
-            <h1 className="welcome-message">Welcome Back, {user?.firstName || "User"}!</h1>
-            <ChatBox />
+            <h1 className="welcome-message">
+              Welcome Back, {user?.firstName || "User"}!
+            </h1>
+
+            <ChatBox newChatTrigger={newChatTrigger} />
           </main>
         )}
       </div>

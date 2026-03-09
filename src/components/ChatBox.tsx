@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react"
 import { Mic } from "lucide-react"
 import "./ChatBox.css"
 
-export default function ChatHomeInput() {
+export default function ChatHomeInput({ newChatTrigger }: { newChatTrigger: number }) {
   const [value, setValue] = useState("")
   const [messages, setMessages] = useState<{ role: string, content: string }[]>([])
   const [isListening, setIsListening] = useState(false)
@@ -10,6 +10,13 @@ export default function ChatHomeInput() {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const recognitionRef = useRef<any>(null)
+
+  // Reset chat when "New Chat" is clicked
+  useEffect(() => {
+    setMessages([])
+    setValue("")
+    setSelectedFile(null)
+  }, [newChatTrigger])
 
   // Initialize Speech Recognition
   useEffect(() => {
@@ -51,7 +58,10 @@ export default function ChatHomeInput() {
     }
   }
 
-  const handleFileClick = () => { fileInputRef.current?.click() }
+  const handleFileClick = () => {
+    fileInputRef.current?.click()
+  }
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -61,55 +71,71 @@ export default function ChatHomeInput() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!value.trim()) return;
-    const userMessage = value;
-    setValue(""); // Instantly clear the input
+    e.preventDefault()
+    if (!value.trim()) return
 
-    // Add user message to chat
-    setMessages(prev => [...prev, { role: "user", content: userMessage }]);
-    // Add a placeholder for the agent's streaming response
-    setMessages(prev => [...prev, { role: "agent", content: "" }]);
+    const userMessage = value
+    setValue("")
+
+    // Add user + placeholder agent message together
+    setMessages(prev => [
+      ...prev,
+      { role: "user", content: userMessage },
+      { role: "agent", content: "" }
+    ])
 
     try {
       const response = await fetch("http://localhost:8000/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_input: userMessage })
-      });
+      })
 
-      const reader = response.body.getReader();
-      let agentMessage = "";
+      const reader = response.body?.getReader()
+      if (!reader) return
+
+      let agentMessage = ""
+
       while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        agentMessage += new TextDecoder().decode(value);
+        const { done, value } = await reader.read()
+        if (done) break
+
+        agentMessage += new TextDecoder().decode(value)
+
         setMessages(prev => {
-          const updated = [...prev];
-          updated[updated.length - 1] = { role: "agent", content: agentMessage };
-          return updated;
-        });
+          const updated = [...prev]
+          updated[updated.length - 1] = { role: "agent", content: agentMessage }
+          return updated
+        })
       }
     } catch (error) {
-      setMessages(prev => [...prev, { role: "agent", content: "Error: Could not reach server." }]);
+      setMessages(prev => [
+        ...prev,
+        { role: "agent", content: "Error: Could not reach server." }
+      ])
     }
-  };
+  }
 
   return (
     <div>
       <div className="chat-messages">
         {messages.map((msg, idx) => (
-          <div key={idx} className={msg.role === "user" ? "user-msg" : "agent-msg"}>
+          <div
+            key={idx}
+            className={msg.role === "user" ? "user-msg" : "agent-msg"}
+          >
             <b>{msg.role === "user" ? "You" : "Copilot"}:</b> {msg.content}
           </div>
         ))}
       </div>
+
       <form className="chat-home-container" onSubmit={handleSubmit}>
         <div className={`chat-home-input-wrapper ${selectedFile ? "expanded" : ""}`}>
 
           {selectedFile && (
             <div className="file-preview-inline">
               <div className="file-icon">PDF</div>
+
               <div className="file-info">
                 <div className="file-name">{selectedFile.name}</div>
                 <div className="file-type">PDF</div>
@@ -126,7 +152,10 @@ export default function ChatHomeInput() {
           )}
 
           <div className="input-row">
-            <button type="button" onClick={handleFileClick}>+</button>
+            <button type="button" onClick={handleFileClick}>
+              +
+            </button>
+
             <input
               type="text"
               placeholder="Ask anything"
@@ -145,6 +174,7 @@ export default function ChatHomeInput() {
           </div>
 
         </div>
+
         <input
           type="file"
           ref={fileInputRef}

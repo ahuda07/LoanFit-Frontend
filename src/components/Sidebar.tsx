@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FiPlus, FiSearch, FiX, FiMenu } from "react-icons/fi";
 import logo from "./Logo.png";
 
-export default function Sidebar() {
+export default function Sidebar({ onNewChat }: { onNewChat: () => void }) {
   const [open, setOpen] = useState(true);
   const [hovered, setHovered] = useState(false);
 
@@ -25,7 +25,6 @@ export default function Sidebar() {
         onMouseLeave={() => setHovered(false)}
         onClick={() => setOpen(true)}
       >
-        {/* Logo hidden when hovered */}
         {!hovered && (
           <img
             src={logo}
@@ -34,7 +33,6 @@ export default function Sidebar() {
           />
         )}
 
-        {/* Hamburger on hover */}
         {hovered && (
           <div
             style={{
@@ -81,14 +79,12 @@ export default function Sidebar() {
           marginBottom: "15px",
         }}
       >
-        {/* Logo */}
         <img
           src={logo}
           alt="LoanFit Copilot"
           style={{ width: "40px", height: "auto" }}
         />
 
-        {/* Close sidebar */}
         <button
           onClick={() => setOpen(false)}
           style={{
@@ -118,8 +114,13 @@ export default function Sidebar() {
           fontSize: "14px",
           color: "white",
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#212121")}
-        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#313131")}
+        onMouseEnter={(e) =>
+          (e.currentTarget.style.backgroundColor = "#212121")
+        }
+        onMouseLeave={(e) =>
+          (e.currentTarget.style.backgroundColor = "#313131")
+        }
+        onClick={onNewChat}
       >
         <FiPlus /> New Chat
       </button>
@@ -133,8 +134,12 @@ export default function Sidebar() {
           borderRadius: "6px",
           marginBottom: "15px",
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#212121")}
-        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#313131")}
+        onMouseEnter={(e) =>
+          (e.currentTarget.style.backgroundColor = "#212121")
+        }
+        onMouseLeave={(e) =>
+          (e.currentTarget.style.backgroundColor = "#313131")
+        }
       >
         <FiSearch style={{ marginRight: "6px" }} />
         <input
@@ -155,6 +160,7 @@ export default function Sidebar() {
         <p style={{ fontSize: "12px", opacity: 0.6, marginBottom: "6px" }}>
           Your Chats
         </p>
+
         {chats.map((chat, idx) => (
           <div
             key={idx}
@@ -167,8 +173,12 @@ export default function Sidebar() {
               backgroundColor: "#313131",
               transition: "background 0.2s",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#212121")}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#313131")}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "#212121")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "#313131")
+            }
           >
             {chat}
           </div>
