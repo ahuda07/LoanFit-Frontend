@@ -1,6 +1,5 @@
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser, useAuth } from '@clerk/clerk-react'
 import { useEffect, useState } from 'react'
-import { FiPlus } from "react-icons/fi"
 import './App.css'
 import Sidebar from './components/Sidebar'
 import ChatBox from './components/ChatBox'
@@ -11,7 +10,6 @@ function App() {
   const { signOut } = useAuth();
   const [authError, setAuthError] = useState("");
   const [newChatTrigger, setNewChatTrigger] = useState(0);
-  const [logoHovered, setLogoHovered] = useState(false);
 
   useEffect(() => {
     const storedError = sessionStorage.getItem('clerkAuthError');
@@ -57,28 +55,16 @@ function App() {
             top: 10,
             left: 10,
             zIndex: 1000,
-            width: "40px",
-            height: "40px",
-            cursor: "pointer",
             display: "flex",
             alignItems: "center",
             justifyContent: "center"
           }}
-          onClick={() => setNewChatTrigger(prev => prev + 1)}
-          onMouseEnter={() => setLogoHovered(true)}
-          onMouseLeave={() => setLogoHovered(false)}
         >
-          {!logoHovered && (
-            <img
-              src={logo}
-              alt="Logo"
-              style={{ width: "40px", height: "auto" }}
-            />
-          )}
-
-          {logoHovered && (
-            <FiPlus size={22} color="white" />
-          )}
+          <img
+            src={logo}
+            alt="Logo"
+            style={{ width: "40px", height: "auto" }}
+          />
         </div>
       )}
 
@@ -106,15 +92,28 @@ function App() {
           </SignedIn>
         </header>
 
-        {!isUnauthorized && (
+        <SignedOut>
           <main className="main-content">
-            <h1 className="welcome-message">
-              Welcome Back, {user?.firstName || "User"}!
+            <h1 className="welcome-message" style={{ textAlign: 'center' }}>
+              Welcome to LoanFit Copilot!
             </h1>
-
-            <ChatBox newChatTrigger={newChatTrigger} />
+            <p className="welcome-message" style={{ textAlign: 'center' }}>
+              Please login to continue...
+            </p>
           </main>
-        )}
+        </SignedOut>
+
+        <SignedIn>
+          {!isUnauthorized && (
+            <main className="main-content">
+              <h1 className="welcome-message">
+                Welcome Back, {user?.firstName || "User"}!
+              </h1>
+
+              <ChatBox newChatTrigger={newChatTrigger} />
+            </main>
+          )}
+        </SignedIn>
       </div>
     </div>
   )
