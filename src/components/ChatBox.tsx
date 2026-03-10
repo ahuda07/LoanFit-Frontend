@@ -1,12 +1,23 @@
 import { useState, useRef, useEffect } from "react"
+import { useAuth } from "@clerk/clerk-react"
 import { Mic } from "lucide-react"
 import "./ChatBox.css"
 
-export default function ChatHomeInput({ newChatTrigger }: { newChatTrigger: number }) {
+export default function ChatHomeInput({
+  newChatTrigger,
+  activeSessionId,
+  initialMessages
+}: {
+  newChatTrigger: number;
+  activeSessionId?: string | null;
+  initialMessages?: { role: string, content: string }[];
+}) {
+  const { getToken } = useAuth()
   const [value, setValue] = useState("")
   const [messages, setMessages] = useState<{ role: string, content: string }[]>([])
   const [isListening, setIsListening] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [sessionId, setSessionId] = useState<string | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const recognitionRef = useRef<any>(null)
@@ -15,7 +26,17 @@ export default function ChatHomeInput({ newChatTrigger }: { newChatTrigger: numb
     setMessages([])
     setValue("")
     setSelectedFile(null)
+    setSessionId(null)
   }, [newChatTrigger])
+
+  useEffect(() => {
+    if (activeSessionId && initialMessages) {
+      setSessionId(activeSessionId)
+      setMessages(initialMessages)
+      setValue("")
+      setSelectedFile(null)
+    }
+  }, [activeSessionId, initialMessages])
 
   useEffect(() => {
     const SpeechRecognition =
@@ -78,15 +99,28 @@ export default function ChatHomeInput({ newChatTrigger }: { newChatTrigger: numb
     setMessages(prev => [
       ...prev,
       { role: "user", content: userMessage },
-      { role: "agent", content: "" }
+      { role: "assistant", content: "" }
     ])
 
     try {
+      const token = await getToken()
+
       const response = await fetch("http://localhost:8000/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_input: userMessage })
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          user_input: userMessage,
+          session_id: sessionId
+        })
       })
+
+      const newSessionId = response.headers.get("X-Session-ID")
+      if (newSessionId && !sessionId) {
+        setSessionId(newSessionId)
+      }
 
       const reader = response.body?.getReader()
       if (!reader) return
@@ -101,14 +135,14 @@ export default function ChatHomeInput({ newChatTrigger }: { newChatTrigger: numb
 
         setMessages(prev => {
           const updated = [...prev]
-          updated[updated.length - 1] = { role: "agent", content: agentMessage }
+          updated[updated.length - 1] = { role: "assistant", content: agentMessage }
           return updated
         })
       }
     } catch (error) {
       setMessages(prev => [
         ...prev,
-        { role: "agent", content: "Error: Could not reach server." }
+        { role: "assistant", content: "Error: Could not reach server." }
       ])
     }
   }

@@ -1,12 +1,46 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FiPlus, FiSearch, FiX, FiMenu } from "react-icons/fi";
+import { useAuth } from "@clerk/clerk-react";
 import logo from "./Logo.png";
 
-export default function Sidebar({ onNewChat }: { onNewChat: () => void }) {
+export default function Sidebar({
+  onNewChat,
+  onSelectChat
+}: {
+  onNewChat: () => void;
+  onSelectChat?: (sessionId: string, messages: any[]) => void;
+}) {
   const [open, setOpen] = useState(true);
   const [hovered, setHovered] = useState(false);
 
-  const chats = ["John", "Matt", "Chris", "Jacob"];
+  const { getToken } = useAuth();
+  const [chats, setChats] = useState<{ session_id: string; title: string; updated_at: string; messages?: any[] }[]>([]);
+
+  // Fetch historical chats on mount
+  useEffect(() => {
+    async function fetchChats() {
+      try {
+        const token = await getToken();
+        if (!token) return;
+
+        const response = await fetch("http://localhost:8000/api/chats", {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setChats(data.sessions || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch chats", err);
+      }
+    }
+
+    // We should fetch when sidebar opens, or listen to newChatTrigger events, but for now fetch on mount
+    fetchChats();
+  }, [getToken, open]);
 
   // Collapsed view
   if (!open) {
@@ -161,9 +195,15 @@ export default function Sidebar({ onNewChat }: { onNewChat: () => void }) {
           Your Chats
         </p>
 
-        {chats.map((chat, idx) => (
+        {chats.map((chat) => (
           <div
-            key={idx}
+            key={chat.session_id}
+            onClick={() => {
+              if (onSelectChat) {
+                onSelectChat(chat.session_id, chat.messages || []);
+              }
+              console.log("Switching to session:", chat.session_id);
+            }}
             style={{
               padding: "8px 10px",
               borderRadius: "6px",
@@ -172,6 +212,9 @@ export default function Sidebar({ onNewChat }: { onNewChat: () => void }) {
               fontSize: "14px",
               backgroundColor: "#313131",
               transition: "background 0.2s",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis"
             }}
             onMouseEnter={(e) =>
               (e.currentTarget.style.backgroundColor = "#212121")
@@ -180,7 +223,7 @@ export default function Sidebar({ onNewChat }: { onNewChat: () => void }) {
               (e.currentTarget.style.backgroundColor = "#313131")
             }
           >
-            {chat}
+            {chat.title}
           </div>
         ))}
       </div>

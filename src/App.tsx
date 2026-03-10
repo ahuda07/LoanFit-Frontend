@@ -10,6 +10,12 @@ function App() {
   const { signOut } = useAuth();
   const [authError, setAuthError] = useState("");
   const [newChatTrigger, setNewChatTrigger] = useState(0);
+  const [activeSession, setActiveSession] = useState<{ sessionId: string, messages: any[] } | null>(null);
+
+  const handleNewChat = () => {
+    setActiveSession(null);
+    setNewChatTrigger(prev => prev + 1);
+  };
 
   useEffect(() => {
     const storedError = sessionStorage.getItem('clerkAuthError');
@@ -23,6 +29,7 @@ function App() {
   useEffect(() => {
     if (isLoaded && isSignedIn && user) {
       const email = user.primaryEmailAddress?.emailAddress;
+      // Replace with @gmail.com to test multiple accounts
       if (email && !email.endsWith('@uci.edu')) {
         const errorMsg = "Error: You are not authorized to sign in. Only @uci.edu emails are currently allowed.";
         sessionStorage.setItem('clerkAuthError', errorMsg);
@@ -39,13 +46,17 @@ function App() {
     isSignedIn &&
     user &&
     user.primaryEmailAddress?.emailAddress &&
+    // Replace with @gmail.com to test with multiple accounts
     !user.primaryEmailAddress.emailAddress.endsWith('@uci.edu');
 
   return (
     <div className="main-layout">
 
       {isSignedIn && (
-        <Sidebar onNewChat={() => setNewChatTrigger(prev => prev + 1)} />
+        <Sidebar
+          onNewChat={handleNewChat}
+          onSelectChat={(sessionId, messages) => setActiveSession({ sessionId, messages })}
+        />
       )}
 
       {!isSignedIn && (
@@ -110,7 +121,11 @@ function App() {
                 Welcome Back, {user?.firstName || "User"}!
               </h1>
 
-              <ChatBox newChatTrigger={newChatTrigger} />
+              <ChatBox
+                newChatTrigger={newChatTrigger}
+                activeSessionId={activeSession?.sessionId}
+                initialMessages={activeSession?.messages}
+              />
             </main>
           )}
         </SignedIn>
