@@ -12,11 +12,13 @@ type Message = {
 export default function ChatHomeInput({
   newChatTrigger,
   activeSessionId,
-  initialMessages
+  initialMessages,
+  userName
 }: {
   newChatTrigger: number;
   activeSessionId?: string | null;
   initialMessages?: { role: string, content: string }[];
+  userName?: string;
 }) {
   const { getToken } = useAuth()
   const [value, setValue] = useState("")
@@ -187,6 +189,13 @@ export default function ChatHomeInput({
       <div className="chat-content">
         <div className="chat-column">
           <div className="chat-messages">
+            {!hasMessages && (
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <h1 className="welcome-message" style={{ textAlign: 'center' }}>
+                  Welcome Back, {userName || "User"}!
+                </h1>
+              </div>
+            )}
             {messages.map((msg, idx) => (
               <div key={idx} className={msg.role === "user" ? "user-msg" : "agent-msg"}>
                 <b>{msg.role === "user" ? "You" : "Copilot"}:</b>

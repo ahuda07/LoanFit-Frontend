@@ -117,14 +117,11 @@ function App() {
         <SignedIn>
           {!isUnauthorized && (
             <main className="main-content">
-              <h1 className="welcome-message">
-                Welcome Back, {user?.firstName || "User"}!
-              </h1>
-
               <ChatBox
                 newChatTrigger={newChatTrigger}
                 activeSessionId={activeSession?.sessionId}
                 initialMessages={activeSession?.messages}
+                userName={user?.firstName || "User"}
               />
             </main>
           )}
