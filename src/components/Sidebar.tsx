@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FiPlus, FiSearch, FiX, FiMenu } from "react-icons/fi";
+import { FiPlus, FiSearch, FiX, FiMenu, FiTrash } from "react-icons/fi";
 import { useAuth } from "@clerk/clerk-react";
 import logo from "./Logo.png";
 
@@ -12,6 +12,9 @@ export default function Sidebar({
 }) {
   const [open, setOpen] = useState(true);
   const [hovered, setHovered] = useState(false);
+  const [hoveredChat, setHoveredChat] = useState<string | null>(null);
+  const [selectedChat, setSelectedChat] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { getToken } = useAuth();
   const [chats, setChats] = useState<{ session_id: string; title: string; updated_at: string; messages?: any[] }[]>([]);
@@ -38,9 +41,40 @@ export default function Sidebar({
       }
     }
 
-    // We should fetch when sidebar opens, or listen to newChatTrigger events, but for now fetch on mount
     fetchChats();
   }, [getToken, open]);
+
+  // Delete chat function
+  const handleDeleteChat = async (sessionId: string) => {
+    try {
+      const token = await getToken();
+      if (!token) return;
+
+      const response = await fetch(`http://localhost:8000/api/chats/${sessionId}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        setChats(prev => prev.filter(c => c.session_id !== sessionId));
+        if (selectedChat === sessionId) {
+          setSelectedChat(null);
+          onNewChat();
+        }
+      } else {
+        console.error("Failed to delete chat");
+      }
+    } catch (err) {
+      console.error("Error deleting chat", err);
+    }
+  };
+
+  // Filter chats by search query
+  const filteredChats = chats.filter(chat =>
+    chat.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   // Collapsed view
   if (!open) {
@@ -154,7 +188,10 @@ export default function Sidebar({
         onMouseLeave={(e) =>
           (e.currentTarget.style.backgroundColor = "#313131")
         }
-        onClick={onNewChat}
+        onClick={() => {
+          setSelectedChat(null); 
+          onNewChat();
+        }}
       >
         <FiPlus /> New Chat
       </button>
@@ -167,6 +204,7 @@ export default function Sidebar({
           padding: "6px 10px",
           borderRadius: "6px",
           marginBottom: "15px",
+          backgroundColor: "#313131",
         }}
         onMouseEnter={(e) =>
           (e.currentTarget.style.backgroundColor = "#212121")
@@ -178,6 +216,18 @@ export default function Sidebar({
         <FiSearch style={{ marginRight: "6px" }} />
         <input
           placeholder="Search chats..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && filteredChats.length > 0) {
+              const chat = filteredChats[0];
+              setSelectedChat(chat.session_id);
+              if (onSelectChat) {
+                onSelectChat(chat.session_id, chat.messages || []);
+              }
+              setSearchQuery("");
+            }
+          }}
           style={{
             background: "transparent",
             border: "none",
@@ -195,37 +245,50 @@ export default function Sidebar({
           Your Chats
         </p>
 
-        {chats.map((chat) => (
-          <div
-            key={chat.session_id}
-            onClick={() => {
-              if (onSelectChat) {
-                onSelectChat(chat.session_id, chat.messages || []);
-              }
-              console.log("Switching to session:", chat.session_id);
-            }}
-            style={{
-              padding: "8px 10px",
-              borderRadius: "6px",
-              marginBottom: "4px",
-              cursor: "pointer",
-              fontSize: "14px",
-              backgroundColor: "#313131",
-              transition: "background 0.2s",
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis"
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor = "#212121")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = "#313131")
-            }
-          >
-            {chat.title}
-          </div>
-        ))}
+        {filteredChats.map((chat) => {
+          const isSelected = selectedChat === chat.session_id;
+          const isHovered = hoveredChat === chat.session_id;
+
+          return (
+            <div
+              key={chat.session_id}
+              onMouseEnter={() => setHoveredChat(chat.session_id)}
+              onMouseLeave={() => setHoveredChat(null)}
+              style={{
+                padding: "8px 10px",
+                borderRadius: "6px",
+                marginBottom: "4px",
+                cursor: "pointer",
+                fontSize: "14px",
+                backgroundColor: isSelected ? "#212121" : isHovered ? "#212121" : "#313131",
+                transition: "background 0.2s",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+              onClick={() => {
+                setSelectedChat(chat.session_id);
+                if (onSelectChat) {
+                  onSelectChat(chat.session_id, chat.messages || []);
+                }
+              }}
+            >
+              <span>{chat.title}</span>
+              {(isHovered || isSelected) && (
+                <FiTrash
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteChat(chat.session_id);
+                  }}
+                  style={{ cursor: "pointer", marginLeft: "8px" }}
+                />
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
