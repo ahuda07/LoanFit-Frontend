@@ -1,22 +1,33 @@
 import { useState, useEffect } from "react";
-import { FiPlus, FiSearch, FiX, FiMenu, FiTrash } from "react-icons/fi";
+import { FiChevronDown, FiChevronUp, FiPlus, FiSearch, FiX, FiMenu, FiTrash } from "react-icons/fi";
 import { useAuth } from "@clerk/clerk-react";
+import { Moon, Sun } from "lucide-react";
 import logo from "./Logo.png";
+import "./Sidebar.css";
 
 export default function Sidebar({
   refreshTrigger,
   onNewChat,
-  onSelectChat
+  onSelectChat,
+  theme,
+  onToggleTheme,
+  fontSize,
+  onFontSizeChange
 }: {
   refreshTrigger?: number;
   onNewChat: () => void;
   onSelectChat?: (sessionId: string, messages: any[]) => void;
+  theme: "light" | "dark";
+  onToggleTheme: () => void;
+  fontSize: "small" | "medium" | "large";
+  onFontSizeChange: (value: "small" | "medium" | "large") => void;
 }) {
   const [open, setOpen] = useState(true);
   const [hovered, setHovered] = useState(false);
   const [hoveredChat, setHoveredChat] = useState<string | null>(null);
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const { getToken } = useAuth();
   const [chats, setChats] = useState<{ session_id: string; title: string; updated_at: string; messages?: any[] }[]>([]);
@@ -82,15 +93,7 @@ export default function Sidebar({
   if (!open) {
     return (
       <div
-        style={{
-          position: "fixed",
-          top: 10,
-          left: 10,
-          zIndex: 1000,
-          width: "40px",
-          height: "40px",
-          cursor: "pointer",
-        }}
+        className="sidebar-collapsed-trigger"
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         onClick={() => setOpen(true)}
@@ -99,26 +102,12 @@ export default function Sidebar({
           <img
             src={logo}
             alt="Logo"
-            style={{ width: "40px", height: "auto", display: "block" }}
+            className="sidebar-collapsed-logo"
           />
         )}
 
         {hovered && (
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "40px",
-              height: "40px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: "6px",
-              color: "white",
-              fontSize: "20px",
-            }}
-          >
+          <div className="sidebar-collapsed-icon">
             <FiMenu />
           </div>
         )}
@@ -128,42 +117,18 @@ export default function Sidebar({
 
   // Full sidebar
   return (
-    <div
-      style={{
-        width: "260px",
-        height: "100vh",
-        backgroundColor: "#313131",
-        color: "white",
-        display: "flex",
-        flexDirection: "column",
-        padding: "10px",
-        boxSizing: "border-box",
-      }}
-    >
+    <div className="sidebar">
       {/* Logo and close button */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "15px",
-        }}
-      >
+      <div className="sidebar-header">
         <img
           src={logo}
           alt="LoanFit Copilot"
-          style={{ width: "40px", height: "auto" }}
+          className="sidebar-logo"
         />
 
         <button
           onClick={() => setOpen(false)}
-          style={{
-            background: "transparent",
-            border: "none",
-            color: "white",
-            cursor: "pointer",
-            fontSize: "20px",
-          }}
+          className="sidebar-icon-button"
         >
           <FiX />
         </button>
@@ -171,25 +136,7 @@ export default function Sidebar({
 
       {/* New Chat Button */}
       <button
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          padding: "10px",
-          marginBottom: "15px",
-          backgroundColor: "#313131",
-          border: "none",
-          borderRadius: "6px",
-          cursor: "pointer",
-          fontSize: "14px",
-          color: "white",
-        }}
-        onMouseEnter={(e) =>
-          (e.currentTarget.style.backgroundColor = "#212121")
-        }
-        onMouseLeave={(e) =>
-          (e.currentTarget.style.backgroundColor = "#313131")
-        }
+        className="sidebar-action-button"
         onClick={() => {
           setSelectedChat(null); 
           onNewChat();
@@ -200,22 +147,9 @@ export default function Sidebar({
 
       {/* Search */}
       <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          padding: "6px 10px",
-          borderRadius: "6px",
-          marginBottom: "15px",
-          backgroundColor: "#313131",
-        }}
-        onMouseEnter={(e) =>
-          (e.currentTarget.style.backgroundColor = "#212121")
-        }
-        onMouseLeave={(e) =>
-          (e.currentTarget.style.backgroundColor = "#313131")
-        }
+        className="sidebar-search"
       >
-        <FiSearch style={{ marginRight: "6px" }} />
+        <FiSearch className="sidebar-search-icon" />
         <input
           placeholder="Search chats..."
           value={searchQuery}
@@ -230,20 +164,13 @@ export default function Sidebar({
               setSearchQuery("");
             }
           }}
-          style={{
-            background: "transparent",
-            border: "none",
-            color: "white",
-            width: "100%",
-            outline: "none",
-            fontSize: "14px",
-          }}
+          className="sidebar-search-input"
         />
       </div>
 
       {/* Chat List */}
-      <div style={{ flex: 1, overflowY: "auto", paddingRight: "4px" }}>
-        <p style={{ fontSize: "12px", opacity: 0.6, marginBottom: "6px" }}>
+      <div className="sidebar-chat-list">
+        <p className="sidebar-chat-heading">
           Your Chats
         </p>
 
@@ -256,19 +183,7 @@ export default function Sidebar({
               key={chat.session_id}
               onMouseEnter={() => setHoveredChat(chat.session_id)}
               onMouseLeave={() => setHoveredChat(null)}
-              style={{
-                padding: "8px 10px",
-                borderRadius: "6px",
-                marginBottom: "4px",
-                cursor: "pointer",
-                fontSize: "14px",
-                backgroundColor: isSelected ? "#212121" : isHovered ? "#212121" : "#313131",
-                transition: "background 0.2s",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                overflow: "hidden",
-              }}
+              className={`sidebar-chat-item ${isSelected || isHovered ? "selected" : ""}`}
               onClick={() => {
                 setSelectedChat(chat.session_id);
                 if (onSelectChat) {
@@ -276,19 +191,81 @@ export default function Sidebar({
                 }
               }}
             >
-              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{chat.title}</span>
+              <span className="sidebar-chat-title">{chat.title}</span>
               {(isHovered || isSelected) && (
                 <FiTrash
                   onClick={(e) => {
                     e.stopPropagation();
                     handleDeleteChat(chat.session_id);
                   }}
-                  style={{ cursor: "pointer", marginLeft: "8px", flexShrink: 0 }}
+                  className="sidebar-trash"
                 />
               )}
             </div>
           );
         })}
+      </div>
+
+      <div className="sidebar-settings">
+        <button
+          type="button"
+          className="sidebar-settings-toggle"
+          onClick={() => setSettingsOpen((prev) => !prev)}
+          aria-expanded={settingsOpen}
+          aria-controls="sidebar-accessibility-panel"
+        >
+          <span className="sidebar-settings-label">Accessibility</span>
+          <span className="sidebar-settings-chevron">
+            {settingsOpen ? <FiChevronUp /> : <FiChevronDown />}
+          </span>
+        </button>
+
+        {settingsOpen && (
+          <div id="sidebar-accessibility-panel" className="sidebar-settings-panel">
+            <div className="sidebar-settings-row">
+              <span className="sidebar-settings-name">Text size</span>
+              <div className="sidebar-font-size-controls" role="group" aria-label="Font size">
+                <button
+                  type="button"
+                  className={`sidebar-font-size-button ${fontSize === "small" ? "active" : ""}`}
+                  onClick={() => onFontSizeChange("small")}
+                  aria-pressed={fontSize === "small"}
+                >
+                  S
+                </button>
+                <button
+                  type="button"
+                  className={`sidebar-font-size-button ${fontSize === "medium" ? "active" : ""}`}
+                  onClick={() => onFontSizeChange("medium")}
+                  aria-pressed={fontSize === "medium"}
+                >
+                  M
+                </button>
+                <button
+                  type="button"
+                  className={`sidebar-font-size-button ${fontSize === "large" ? "active" : ""}`}
+                  onClick={() => onFontSizeChange("large")}
+                  aria-pressed={fontSize === "large"}
+                >
+                  L
+                </button>
+              </div>
+            </div>
+
+            <div className="sidebar-settings-row">
+              <span className="sidebar-settings-name">Theme</span>
+              <button
+                type="button"
+                className="sidebar-theme-toggle"
+                onClick={onToggleTheme}
+                aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+                title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              >
+                {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -4,11 +4,14 @@
   height: 100vh;
   width: 100vw;
   overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
 }
 
 .app-header {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   padding: 1rem 2rem;
   width: 100%;
   box-sizing: border-box;
@@ -19,15 +22,15 @@
   border: 1px solid currentColor;
   border-radius: 20px;
   padding: 0.5rem 1.5rem;
-  font-size: 0.9rem;
+  font-size: var(--font-size-sm);
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .login-button:hover {
-  background-color: rgba(244, 121, 32, 0.1);
-  border-color: #F47920;
-  color: #F47920;
+  background-color: var(--button-hover-bg);
+  border-color: var(--accent-2);
+  color: var(--accent-2);
 }
 
 .main-content {
@@ -41,10 +44,10 @@
 }
 
 .welcome-message {
-  font-size: 3rem;
+  font-size: var(--font-size-hero);
   font-weight: 700;
   margin: 0;
-  background: linear-gradient(135deg, #29384B 0%, #EA0A56 50%, #F47920 100%);
+  background: var(--welcome-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -58,12 +61,12 @@
 
 .auth-error-banner {
   padding: 10px;
-  background-color: #ffebee;
-  color: #c62828;
+  background-color: var(--error-bg);
+  color: var(--error-text);
   text-align: center;
   margin: 10px;
   border-radius: 5px;
-  border: 1px solid #ef9a9a;
+  border: 1px solid var(--error-border);
 }
 
 .login-hint {

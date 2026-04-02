@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react"
 import { useAuth } from "@clerk/clerk-react"
-import { Mic } from "lucide-react"
+import { ArrowUp, Mic } from "lucide-react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import "./ChatBox.css"
@@ -275,6 +275,15 @@ export default function ChatHomeInput({
                   onClick={handleMicClick}
                 >
                   <Mic size={18} />
+                </button>
+
+                <button
+                  type="submit"
+                  className="submit-button"
+                  disabled={!value.trim() && !selectedFile}
+                  aria-label="Send message"
+                >
+                  <ArrowUp size={18} />
                 </button>
               </div>
             </div>

@@ -59,8 +59,8 @@
 
 .user-msg {
   align-self: flex-end;
-  background: #9b1c3d;
-  color: white;
+  background: var(--user-msg-bg);
+  color: var(--text);
 
   padding: 14px 18px;
   border-radius: 18px;
@@ -74,8 +74,8 @@
 
 .agent-msg {
   align-self: flex-start;
-  background: #1f1f1f;
-  color: white;
+  background: var(--agent-msg-bg);
+  color: var(--text);
 
   padding: 14px 18px;
   border-radius: 18px;
@@ -88,7 +88,7 @@
 /* FILE CHIP */
 
 .chat-file {
-  font-size: 13px;
+  font-size: var(--font-size-sm);
   opacity: 0.9;
   margin-bottom: 6px;
 }
@@ -126,9 +126,9 @@
 
   width: 100%;
 
-  background: #1e1e1e;
+  background: var(--surface);
 
-  border: 1px solid #EA0A56;
+  border: 1px solid var(--accent);
   border-radius: 30px;
 
   padding: 1rem;
@@ -156,8 +156,8 @@
   background: transparent;
   border: none;
 
-  color: white;
-  font-size: 15px;
+  color: var(--text);
+  font-size: var(--font-size-md);
 
   outline: none;
 }
@@ -169,7 +169,7 @@
   background: none;
   border: none;
 
-  color: white;
+  color: var(--text);
   cursor: pointer;
 
   display: flex;
@@ -177,11 +177,35 @@
   justify-content: center;
 }
 
+.submit-button {
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.submit-button:hover:not(:disabled) {
+  background: var(--accent-2);
+  border-color: var(--accent-2);
+}
+
+.submit-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 
 /* LISTENING STATE */
 
 .icon-button.listening {
-  color: #EA0A56;
+  color: var(--accent);
 }
 
 
@@ -192,7 +216,7 @@
   align-items: center;
   gap: 10px;
 
-  background: #2a2a2a;
+  background: var(--surface-2);
 
   padding: 8px 12px;
   border-radius: 12px;
@@ -202,9 +226,9 @@
 
 
 .file-icon {
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   font-weight: bold;
-  color: #EA0A56;
+  color: var(--accent);
 }
 
 
@@ -215,13 +239,13 @@
 
 
 .file-name {
-  font-size: 13px;
+  font-size: var(--font-size-sm);
 }
 
 
 .file-type {
-  font-size: 11px;
-  opacity: 0.7;
+  font-size: calc(0.6875rem * var(--font-scale));
+  color: var(--text-subtle);
 }
 
 
@@ -230,7 +254,7 @@
 .remove-file {
   background: none;
   border: none;
-  color: white;
+  color: var(--text);
   cursor: pointer;
 }
 
@@ -249,7 +273,7 @@
 }
 
 .markdown-content pre {
-  background-color: #2b2b2b;
+  background-color: var(--surface-3);
   padding: 12px;
   border-radius: 8px;
   overflow-x: auto;
@@ -258,10 +282,10 @@
 
 .markdown-content code {
   font-family: monospace;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--code-inline-bg);
   padding: 2px 4px;
   border-radius: 4px;
-  font-size: 0.9em;
+  font-size: var(--font-size-sm);
 }
 
 .markdown-content pre code {
@@ -279,7 +303,7 @@
 }
 
 .markdown-content a {
-  color: #EA0A56;
+  color: var(--accent);
   text-decoration: underline;
 }
 
@@ -296,20 +320,20 @@
 }
 
 .markdown-content th, .markdown-content td {
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--border-soft);
   padding: 8px;
   text-align: left;
 }
 
 .markdown-content th {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--code-inline-bg);
 }
 
 .markdown-content blockquote {
-  border-left: 4px solid #EA0A56;
+  border-left: 4px solid var(--accent);
   margin: 10px 0;
   padding-left: 10px;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text-muted);
 }
 
 /* THINKING INDICATOR */
@@ -326,7 +350,7 @@
 .thinking-dot {
   width: 6px;
   height: 6px;
-  background-color: white;
+  background-color: var(--text);
   border-radius: 50%;
   animation: typing 1.4s infinite ease-in-out both;
   opacity: 0.5;

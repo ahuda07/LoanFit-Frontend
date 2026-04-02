@@ -5,6 +5,8 @@ import Sidebar from './components/Sidebar'
 import ChatBox from './components/ChatBox'
 import logo from './components/Logo.png'
 
+type FontSize = 'small' | 'medium' | 'large'
+
 function App() {
   const { isLoaded, isSignedIn, user } = useUser();
   const { signOut } = useAuth();
@@ -12,11 +14,27 @@ function App() {
   const [newChatTrigger, setNewChatTrigger] = useState(0);
   const [activeSession, setActiveSession] = useState<{ sessionId: string, messages: any[] } | null>(null);
   const [refreshChatsTrigger, setRefreshChatsTrigger] = useState(0);
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    return (localStorage.getItem('theme') as 'light' | 'dark') || 'dark';
+  });
+  const [fontSize, setFontSize] = useState<FontSize>(() => {
+    return (localStorage.getItem('fontSize') as FontSize) || 'medium';
+  });
 
   const handleNewChat = () => {
     setActiveSession(null);
     setNewChatTrigger(prev => prev + 1);
   };
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('theme', theme)
+  }, [theme])
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-font-size', fontSize)
+    localStorage.setItem('fontSize', fontSize)
+  }, [fontSize])
 
   useEffect(() => {
     const storedError = sessionStorage.getItem('clerkAuthError');
@@ -58,6 +76,10 @@ function App() {
           refreshTrigger={refreshChatsTrigger}
           onNewChat={handleNewChat}
           onSelectChat={(sessionId, messages) => setActiveSession({ sessionId, messages })}
+          theme={theme}
+          onToggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          fontSize={fontSize}
+          onFontSizeChange={setFontSize}
         />
       )}
 
