@@ -126,14 +126,15 @@
 
   width: 100%;
 
-  background: #1e1e1e;
+  background: #ffffff;
 
-  border: 1px solid #EA0A56;
+  border: 1px solid rgba(234, 10, 86, 0.5);
   border-radius: 30px;
 
   padding: 1rem;
 
   transition: all 0.25s ease;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
 
   box-sizing: border-box;
 }
@@ -156,10 +157,14 @@
   background: transparent;
   border: none;
 
-  color: white;
+  color: #1a1a1a;
   font-size: 15px;
 
   outline: none;
+}
+
+.chat-home-input::placeholder {
+  color: #999;
 }
 
 
@@ -169,7 +174,7 @@
   background: none;
   border: none;
 
-  color: white;
+  color: #555;
   cursor: pointer;
 
   display: flex;
@@ -233,6 +238,40 @@
   color: white;
   cursor: pointer;
 }
+
+/* STARTER PROMPT CHIPS */
+
+.starter-chips {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  max-width: 580px;
+  width: 100%;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.starter-chip {
+  background: #ffffff;
+  border: 1px solid rgba(234, 10, 86, 0.3);
+  color: #333;
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.starter-chip:hover {
+  background: #fff0f4;
+  border-color: #EA0A56;
+  color: #EA0A56;
+  box-shadow: 0 0 0 1px rgba(234, 10, 86, 0.3), 0 4px 14px rgba(234, 10, 86, 0.12);
+}
+
 
 /* MARKDOWN STYLES */
 

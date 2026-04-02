@@ -196,16 +196,43 @@ export default function ChatHomeInput({
 
   const hasMessages = messages.length > 0
 
+  const starterPrompts = [
+    "What loan is best for a first-time homebuyer?",
+    "Compare fixed vs. adjustable rate mortgages",
+    "What can I qualify for with my income?",
+    "What's the difference between personal and home loans?",
+  ]
+
+  const handleStarterClick = (prompt: string) => {
+    setValue(prompt)
+    setTimeout(() => {
+      const form = document.querySelector("form") as HTMLFormElement
+      form?.requestSubmit()
+    }, 0)
+  }
+
   return (
     <div className="chat-viewport">
       <div className="chat-content">
         <div className="chat-column">
           <div className="chat-messages">
             {!hasMessages && (
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '24px' }}>
                 <h1 className="welcome-message" style={{ textAlign: 'center' }}>
                   Welcome Back, {userName || "User"}!
                 </h1>
+                <div className="starter-chips">
+                  {starterPrompts.map((prompt) => (
+                    <button
+                      key={prompt}
+                      type="button"
+                      className="starter-chip"
+                      onClick={() => handleStarterClick(prompt)}
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
             {messages.map((msg, idx) => (
