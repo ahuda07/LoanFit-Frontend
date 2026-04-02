@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react"
 import { useAuth } from "@clerk/clerk-react"
 import { Mic } from "lucide-react"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 import "./ChatBox.css"
 
 type Message = {
@@ -13,12 +15,16 @@ export default function ChatHomeInput({
   newChatTrigger,
   activeSessionId,
   initialMessages,
-  userName
+  userName,
+  onChatCreated,
+  onChatUpdated
 }: {
   newChatTrigger: number;
   activeSessionId?: string | null;
   initialMessages?: { role: string, content: string }[];
   userName?: string;
+  onChatCreated?: () => void;
+  onChatUpdated?: () => void;
 }) {
   const { getToken } = useAuth()
   const [value, setValue] = useState("")
@@ -145,6 +151,9 @@ export default function ChatHomeInput({
       const newSessionId = response.headers.get("X-Session-ID")
       if (newSessionId && !sessionId) {
         setSessionId(newSessionId)
+        if (onChatCreated) {
+          onChatCreated();
+        }
       }
 
       const reader = response.body?.getReader()
@@ -169,6 +178,9 @@ export default function ChatHomeInput({
       }
 
       setSelectedFile(null)
+      if (onChatUpdated) {
+        onChatUpdated()
+      }
     } catch (error) {
       setMessages((prev) => [
         ...prev,
@@ -206,7 +218,19 @@ export default function ChatHomeInput({
                   </div>
                 )}
 
-                <div>{msg.content}</div>
+                <div className="markdown-content">
+                  {msg.role === "assistant" && msg.content === "" ? (
+                    <div className="thinking-indicator">
+                      <div className="thinking-dot"></div>
+                      <div className="thinking-dot"></div>
+                      <div className="thinking-dot"></div>
+                    </div>
+                  ) : (
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {msg.content}
+                    </ReactMarkdown>
+                  )}
+                </div>
               </div>
             ))}
 

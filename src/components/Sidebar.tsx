@@ -4,9 +4,11 @@ import { useAuth } from "@clerk/clerk-react";
 import logo from "./Logo.png";
 
 export default function Sidebar({
+  refreshTrigger,
   onNewChat,
   onSelectChat
 }: {
+  refreshTrigger?: number;
   onNewChat: () => void;
   onSelectChat?: (sessionId: string, messages: any[]) => void;
 }) {
@@ -42,7 +44,7 @@ export default function Sidebar({
     }
 
     fetchChats();
-  }, [getToken, open]);
+  }, [getToken, open, refreshTrigger]);
 
   // Delete chat function
   const handleDeleteChat = async (sessionId: string) => {
@@ -262,12 +264,10 @@ export default function Sidebar({
                 fontSize: "14px",
                 backgroundColor: isSelected ? "#212121" : isHovered ? "#212121" : "#313131",
                 transition: "background 0.2s",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                overflow: "hidden",
               }}
               onClick={() => {
                 setSelectedChat(chat.session_id);
@@ -276,14 +276,14 @@ export default function Sidebar({
                 }
               }}
             >
-              <span>{chat.title}</span>
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{chat.title}</span>
               {(isHovered || isSelected) && (
                 <FiTrash
                   onClick={(e) => {
                     e.stopPropagation();
                     handleDeleteChat(chat.session_id);
                   }}
-                  style={{ cursor: "pointer", marginLeft: "8px" }}
+                  style={{ cursor: "pointer", marginLeft: "8px", flexShrink: 0 }}
                 />
               )}
             </div>

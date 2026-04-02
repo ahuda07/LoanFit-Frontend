@@ -11,6 +11,7 @@ function App() {
   const [authError, setAuthError] = useState("");
   const [newChatTrigger, setNewChatTrigger] = useState(0);
   const [activeSession, setActiveSession] = useState<{ sessionId: string, messages: any[] } | null>(null);
+  const [refreshChatsTrigger, setRefreshChatsTrigger] = useState(0);
 
   const handleNewChat = () => {
     setActiveSession(null);
@@ -54,6 +55,7 @@ function App() {
 
       {isSignedIn && (
         <Sidebar
+          refreshTrigger={refreshChatsTrigger}
           onNewChat={handleNewChat}
           onSelectChat={(sessionId, messages) => setActiveSession({ sessionId, messages })}
         />
@@ -104,7 +106,7 @@ function App() {
         </header>
 
         <SignedOut>
-          <main className="main-content">
+          <main className="main-content" style={{ justifyContent: 'center' }}>
             <h1 className="welcome-message" style={{ textAlign: 'center' }}>
               Welcome to LoanFit Copilot!
             </h1>
@@ -122,6 +124,8 @@ function App() {
                 activeSessionId={activeSession?.sessionId}
                 initialMessages={activeSession?.messages}
                 userName={user?.firstName || "User"}
+                onChatCreated={() => setRefreshChatsTrigger(prev => prev + 1)}
+                onChatUpdated={() => setRefreshChatsTrigger(prev => prev + 1)}
               />
             </main>
           )}
