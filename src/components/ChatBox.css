@@ -276,9 +276,9 @@
 }
 
 .starter-chip {
-  background: #ffffff;
-  border: 1px solid rgba(234, 10, 86, 0.3);
-  color: #333;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  color: var(--text);
   border-radius: 14px;
   padding: 14px 18px;
   font-size: 13.5px;
@@ -290,10 +290,10 @@
 }
 
 .starter-chip:hover {
-  background: #fff0f4;
-  border-color: #EA0A56;
-  color: #EA0A56;
-  box-shadow: 0 0 0 1px rgba(234, 10, 86, 0.3), 0 4px 14px rgba(234, 10, 86, 0.12);
+  background: var(--surface-2);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 4px 14px rgba(0, 0, 0, 0.12);
 }
 
 
