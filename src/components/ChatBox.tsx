@@ -32,6 +32,7 @@ export default function ChatHomeInput({
   const [isListening, setIsListening] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [sessionId, setSessionId] = useState<string | null>(null)
+  const [copiedIdx, setCopiedIdx] = useState<number | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const recognitionRef = useRef<any>(null)
@@ -109,6 +110,12 @@ export default function ChatHomeInput({
       recognitionRef.current.start()
       setIsListening(true)
     }
+  }
+
+  const handleCopy = (text: string, idx: number) => {
+    navigator.clipboard.writeText(text)
+    setCopiedIdx(idx)
+    setTimeout(() => setCopiedIdx(null), 2000)
   }
 
   const handleFileClick = () => {
@@ -285,6 +292,16 @@ export default function ChatHomeInput({
                     </ReactMarkdown>
                   )}
                 </div>
+
+                {msg.role === "assistant" && msg.content !== "" && (
+                  <button
+                    className="copy-button"
+                    onClick={() => handleCopy(msg.content, idx)}
+                    title="Copy to clipboard"
+                  >
+                    {copiedIdx === idx ? <Check size={14} /> : <Copy size={14} />}
+                  </button>
+                )}
               </div>
             ))}
 
