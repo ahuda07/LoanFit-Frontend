@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react"
 import { useAuth } from "@clerk/clerk-react"
-import { ArrowUp, Mic } from "lucide-react"
+import { ArrowUp, Mic, Volume2, VolumeX } from "lucide-react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import "./ChatBox.css"
@@ -36,6 +36,21 @@ export default function ChatHomeInput({
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const recognitionRef = useRef<any>(null)
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
+  const [speakingIndex, setSpeakingIndex] = useState<number | null>(null)
+
+  const handleSpeak = (text: string, idx: number) => {
+    if (speakingIndex === idx) {
+      window.speechSynthesis.cancel()
+      setSpeakingIndex(null)
+      return
+    }
+    window.speechSynthesis.cancel()
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.onend = () => setSpeakingIndex(null)
+    utterance.onerror = () => setSpeakingIndex(null)
+    setSpeakingIndex(idx)
+    window.speechSynthesis.speak(utterance)
+  }
 
   useEffect(() => {
     setMessages([])
@@ -237,7 +252,19 @@ export default function ChatHomeInput({
             )}
             {messages.map((msg, idx) => (
               <div key={idx} className={msg.role === "user" ? "user-msg" : "agent-msg"}>
-                <b>{msg.role === "user" ? "You" : "Copilot"}:</b>
+                <div className="msg-header">
+                  <b>{msg.role === "user" ? "You" : "Copilot"}:</b>
+                  {msg.role === "assistant" && msg.content !== "" && (
+                    <button
+                      type="button"
+                      className="tts-button"
+                      onClick={() => handleSpeak(msg.content, idx)}
+                      aria-label={speakingIndex === idx ? "Stop speaking" : "Read message aloud"}
+                    >
+                      {speakingIndex === idx ? <VolumeX size={15} /> : <Volume2 size={15} />}
+                    </button>
+                  )}
+                </div>
 
                 {msg.file && (
                   <div className="chat-file">

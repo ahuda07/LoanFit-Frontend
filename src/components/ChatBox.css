@@ -85,6 +85,33 @@
 }
 
 
+/* MESSAGE HEADER */
+
+.msg-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.tts-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text);
+  opacity: 0.5;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  transition: opacity 0.2s;
+}
+
+.tts-button:hover {
+  opacity: 1;
+}
+
+
 /* FILE CHIP */
 
 .chat-file {
