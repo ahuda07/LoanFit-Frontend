@@ -23,7 +23,7 @@ export default function ChatHomeInput({
   activeSessionId?: string | null;
   initialMessages?: { role: string, content: string }[];
   userName?: string;
-  onChatCreated?: () => void;
+  onChatCreated?: (sessionId: string) => void;
   onChatUpdated?: () => void;
 }) {
   const { getToken } = useAuth()
@@ -45,13 +45,13 @@ export default function ChatHomeInput({
   }, [newChatTrigger])
 
   useEffect(() => {
-    if (activeSessionId && initialMessages) {
+    if (activeSessionId && initialMessages && activeSessionId !== sessionId) {
       setSessionId(activeSessionId)
       setMessages(initialMessages)
       setValue("")
       setSelectedFile(null)
     }
-  }, [activeSessionId, initialMessages])
+  }, [activeSessionId, initialMessages, sessionId])
 
   useEffect(() => {
     const SpeechRecognition =
@@ -152,7 +152,7 @@ export default function ChatHomeInput({
       if (newSessionId && !sessionId) {
         setSessionId(newSessionId)
         if (onChatCreated) {
-          onChatCreated();
+          onChatCreated(newSessionId);
         }
       }
 

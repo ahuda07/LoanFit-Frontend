@@ -75,6 +75,7 @@ function App() {
         <Sidebar
           refreshTrigger={refreshChatsTrigger}
           onNewChat={handleNewChat}
+          activeSessionId={activeSession?.sessionId ?? null}
           onSelectChat={(sessionId, messages) => setActiveSession({ sessionId, messages })}
           theme={theme}
           onToggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
@@ -146,7 +147,10 @@ function App() {
                 activeSessionId={activeSession?.sessionId}
                 initialMessages={activeSession?.messages}
                 userName={user?.firstName || "User"}
-                onChatCreated={() => setRefreshChatsTrigger(prev => prev + 1)}
+                onChatCreated={(sessionId) => {
+                  setActiveSession({ sessionId, messages: [] });
+                  setRefreshChatsTrigger(prev => prev + 1);
+                }}
                 onChatUpdated={() => setRefreshChatsTrigger(prev => prev + 1)}
               />
             </main>
