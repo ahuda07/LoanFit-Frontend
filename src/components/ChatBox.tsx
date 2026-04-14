@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react"
 import { useAuth } from "@clerk/clerk-react"
-import { ArrowUp, Mic, Volume2, VolumeX } from "lucide-react"
+import { ArrowUp, Mic, Volume2, VolumeX, Copy, Check } from "lucide-react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import "./ChatBox.css"
