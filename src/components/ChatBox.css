@@ -375,6 +375,32 @@
   color: var(--text-muted);
 }
 
+/* COPY BUTTON */
+
+.copy-button {
+  background: none;
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  padding: 4px 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  align-self: flex-end;
+}
+
+.agent-msg:hover .copy-button {
+  opacity: 0.7;
+}
+
+.copy-button:hover {
+  opacity: 1 !important;
+  background: var(--surface-2);
+}
+
+
 /* THINKING INDICATOR */
 
 .thinking-indicator {
