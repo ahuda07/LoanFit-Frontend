@@ -448,6 +448,67 @@
   color: #fff;
 }
 
+/* Delete Modal specific overrides & styles */
+.delete-modal {
+  width: auto;
+  min-width: 320px;
+  max-width: 400px;
+  margin: auto;
+}
+
+.delete-modal-header {
+  justify-content: center;
+}
+
+.delete-modal-title {
+  margin-top: 8px;
+}
+
+.delete-modal-body {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.delete-modal-text {
+  margin: 0 0 24px;
+  font-size: var(--font-size-sm);
+}
+
+.delete-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.delete-modal-button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+  transition: background 0.2s ease, filter 0.2s ease;
+}
+
+.delete-modal-button.cancel {
+  border: 1px solid var(--border-soft);
+  background: transparent;
+  color: var(--text);
+}
+
+.delete-modal-button.cancel:hover {
+  background: var(--surface-2);
+}
+
+.delete-modal-button.confirm {
+  border: none;
+  background: var(--accent);
+  color: white;
+}
+
+.delete-modal-button.confirm:hover {
+  filter: brightness(0.9);
+}
+
 @media (max-width: 720px) {
   .search-modal-overlay {
     padding: 16px;

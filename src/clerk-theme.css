@@ -1,0 +1,8 @@
+.clerk-custom-card {
+  box-shadow: var(--shadow-md) !important;
+  border-radius: 16px !important;
+}
+
+.clerk-custom-primary-button {
+  border-radius: 30px !important;
+}

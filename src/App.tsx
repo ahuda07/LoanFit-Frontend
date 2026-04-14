@@ -1,25 +1,31 @@
-import { SignedIn, SignedOut, SignInButton, UserButton, useUser, useAuth } from '@clerk/clerk-react'
+import { ClerkProvider, SignedIn, SignedOut, SignInButton, UserButton, useUser, useAuth } from '@clerk/clerk-react'
+import { dark } from '@clerk/themes'
 import { useEffect, useState } from 'react'
 import './App.css'
+import './clerk-theme.css'
 import Sidebar from './components/Sidebar'
 import ChatBox from './components/ChatBox'
 import logo from './components/Logo.png'
 
 type FontSize = 'small' | 'medium' | 'large'
 
-function App() {
+function InnerApp({
+  theme,
+  setTheme,
+  fontSize,
+  setFontSize
+}: {
+  theme: 'light' | 'dark';
+  setTheme: React.Dispatch<React.SetStateAction<'light' | 'dark'>>;
+  fontSize: FontSize;
+  setFontSize: React.Dispatch<React.SetStateAction<FontSize>>;
+}) {
   const { isLoaded, isSignedIn, user } = useUser();
   const { signOut } = useAuth();
   const [authError, setAuthError] = useState("");
   const [newChatTrigger, setNewChatTrigger] = useState(0);
   const [activeSession, setActiveSession] = useState<{ sessionId: string, messages: any[] } | null>(null);
   const [refreshChatsTrigger, setRefreshChatsTrigger] = useState(0);
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    return (localStorage.getItem('theme') as 'light' | 'dark') || 'dark';
-  });
-  const [fontSize, setFontSize] = useState<FontSize>(() => {
-    return (localStorage.getItem('fontSize') as FontSize) || 'medium';
-  });
 
   const handleNewChat = () => {
     setActiveSession(null);
@@ -158,6 +164,52 @@ function App() {
         </SignedIn>
       </div>
     </div>
+  )
+}
+
+function App() {
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    return (localStorage.getItem('theme') as 'light' | 'dark') || 'dark';
+  });
+  const [fontSize, setFontSize] = useState<FontSize>(() => {
+    return (localStorage.getItem('fontSize') as FontSize) || 'medium';
+  });
+
+  const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+  if (!PUBLISHABLE_KEY) {
+    throw new Error("Missing Publishable Key");
+  }
+
+  return (
+    <ClerkProvider
+      publishableKey={PUBLISHABLE_KEY}
+      afterSignOutUrl="/"
+      appearance={{
+        baseTheme: theme === 'dark' ? dark : undefined,
+        variables: {
+          colorPrimary: 'var(--accent)',
+          colorBackground: 'var(--surface)',
+          colorInputBackground: 'var(--surface-2)',
+          colorText: 'var(--text)',
+          colorTextSecondary: 'var(--text-muted)',
+          colorDanger: 'var(--error-text)',
+          colorSuccess: '#22c55e',
+          fontFamily: 'inherit'
+        },
+        elements: {
+          card: 'clerk-custom-card',
+          primaryButton: 'clerk-custom-primary-button'
+        }
+      }}
+    >
+      <InnerApp
+        theme={theme}
+        setTheme={setTheme}
+        fontSize={fontSize}
+        setFontSize={setFontSize}
+      />
+    </ClerkProvider>
   )
 }
 

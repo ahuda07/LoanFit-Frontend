@@ -134,7 +134,7 @@
   padding: 1rem;
 
   transition: all 0.25s ease;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-md); /* Elevated shadow to match new modern styling */
 
   box-sizing: border-box;
 }
@@ -279,21 +279,22 @@
   background: var(--surface);
   border: 1px solid var(--border-soft);
   color: var(--text);
-  border-radius: 14px;
-  padding: 14px 18px;
-  font-size: 13.5px;
-  line-height: 1.45;
+  border-radius: 16px; /* Slightly rounder */
+  padding: 16px 20px;
+  font-size: 14px;
+  line-height: 1.5;
   cursor: pointer;
   text-align: left;
-  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.25s ease;
+  box-shadow: var(--shadow-sm);
 }
 
 .starter-chip:hover {
   background: var(--surface-2);
   border-color: var(--accent);
   color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent), 0 4px 14px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 

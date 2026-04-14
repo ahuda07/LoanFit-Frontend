@@ -45,6 +45,7 @@ export default function Sidebar({
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [chatToDelete, setChatToDelete] = useState<string | null>(null);
 
   const { getToken } = useAuth();
   const [chats, setChats] = useState<ChatSession[]>([]);
@@ -314,7 +315,7 @@ export default function Sidebar({
                       <button
                         type="button"
                         className="sidebar-chat-menu-item danger"
-                        onClick={() => handleDeleteChat(chat.session_id)}
+                        onClick={() => setChatToDelete(chat.session_id)}
                       >
                         <FiTrash />
                         <span>Delete</span>
@@ -327,6 +328,45 @@ export default function Sidebar({
           );
         })}
       </div>
+
+      {chatToDelete && (
+        <div className="search-modal-overlay" onClick={() => setChatToDelete(null)}>
+          <div
+            className="search-modal delete-modal"
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-chat-title"
+          >
+            <div className="search-modal-header delete-modal-header">
+              <h2 id="delete-chat-title" className="search-modal-title delete-modal-title">Delete Chat?</h2>
+            </div>
+            
+            <div className="search-modal-body delete-modal-body">
+              <p className="delete-modal-text">Are you sure you want to delete this chat?</p>
+              <div className="delete-modal-actions">
+                <button
+                  type="button"
+                  onClick={() => setChatToDelete(null)}
+                  className="delete-modal-button cancel"
+                >
+                  No
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleDeleteChat(chatToDelete);
+                    setChatToDelete(null);
+                  }}
+                  className="delete-modal-button confirm"
+                >
+                  Yes, Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {searchOpen && (
         <div className="search-modal-overlay" onClick={() => setSearchOpen(false)}>
