@@ -9,6 +9,7 @@ type Message = {
   role: string
   content: string
   file?: string
+  agent_name?: string
 }
 
 export default function ChatHomeInput({
@@ -138,15 +139,18 @@ export default function ChatHomeInput({
     const userMessage = value
     setValue("")
 
-    setMessages((prev) => [
-      ...prev,
-      {
-        role: "user",
-        content: userMessage,
-        file: selectedFile ? selectedFile.name : undefined
-      },
-      { role: "assistant", content: "" }
-    ])
+    setMessages((prev) => {
+      const lastAgentName = [...prev].reverse().find(m => m.role === "assistant" && m.agent_name)?.agent_name || "LoanFit Copilot";
+      return [
+        ...prev,
+        {
+          role: "user",
+          content: userMessage,
+          file: selectedFile ? selectedFile.name : undefined
+        },
+        { role: "assistant", content: "", agent_name: lastAgentName }
+      ]
+    })
 
     try {
       const token = await getToken()
@@ -171,6 +175,7 @@ export default function ChatHomeInput({
       })
 
       const newSessionId = response.headers.get("X-Session-ID")
+      const agentName = response.headers.get("X-Agent-Name") || "Copilot"
       if (newSessionId && !sessionId) {
         setSessionId(newSessionId)
         if (onChatCreated) {
@@ -193,7 +198,8 @@ export default function ChatHomeInput({
           const updated = [...prev]
           updated[updated.length - 1] = {
             role: "assistant",
-            content: agentMessage
+            content: agentMessage,
+            agent_name: agentName
           }
           return updated
         })
@@ -204,15 +210,18 @@ export default function ChatHomeInput({
         onChatUpdated()
       }
     } catch (error) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "user",
-          content: userMessage,
-          file: selectedFile?.name
-        },
-        { role: "assistant", content: "" }
-      ])
+      setMessages((prev) => {
+        const lastAgentName = [...prev].reverse().find(m => m.role === "assistant" && m.agent_name)?.agent_name || "LoanFit Copilot";
+        return [
+          ...prev,
+          {
+            role: "user",
+            content: userMessage,
+            file: selectedFile?.name
+          },
+          { role: "assistant", content: "", agent_name: lastAgentName }
+        ]
+      })
     }
   }
 
@@ -260,7 +269,7 @@ export default function ChatHomeInput({
             {messages.map((msg, idx) => (
               <div key={idx} className={msg.role === "user" ? "user-msg" : "agent-msg"}>
                 <div className="msg-header">
-                  <b>{msg.role === "user" ? "You" : "Copilot"}:</b>
+                  <b>{msg.role === "user" ? "You" : (msg.agent_name || "Copilot")}:</b>
                   {msg.role === "assistant" && msg.content !== "" && (
                     <button
                       type="button"

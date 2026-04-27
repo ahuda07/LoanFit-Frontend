@@ -10,11 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@clerk/clerk-react": "^5.60.2",
-    "@clerk/themes": "^2.4.53",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "react-icons": "^5.5.0",
+    "@clerk/clerk-react": "^5.61.3",
+    "@clerk/themes": "^2.4.57",
+    "lucide-react": "^1.8.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "react-icons": "^5.6.0",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1"
   },
@@ -29,7 +30,7 @@
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
     "typescript": "~5.9.3",
-    "typescript-eslint": "^8.48.0",
+    "typescript-eslint": "^8.58.2",
     "vite": "^7.3.1"
   }
 }
