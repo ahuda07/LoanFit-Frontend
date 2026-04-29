@@ -18,6 +18,8 @@ const parseChatTimestamp = (timestamp: string) => {
   return new Date(hasTimezone ? trimmed : `${trimmed}Z`);
 };
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Sidebar({
   refreshTrigger,
   onNewChat,
@@ -75,7 +77,7 @@ export default function Sidebar({
         const token = await getToken();
         if (!token) return;
 
-        const response = await fetch("http://localhost:8000/api/chats", {
+        const response = await fetch(`${API_URL}/api/chats`, {
           headers: {
             "Authorization": `Bearer ${token}`
           }
@@ -99,7 +101,7 @@ export default function Sidebar({
       const token = await getToken();
       if (!token) return;
 
-      const response = await fetch(`http://localhost:8000/api/chats/${sessionId}`, {
+      const response = await fetch(`${API_URL}/api/chats/${sessionId}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`
@@ -250,7 +252,7 @@ export default function Sidebar({
       <button
         className="sidebar-action-button"
         onClick={() => {
-          setSelectedChat(null); 
+          setSelectedChat(null);
           onNewChat();
         }}
       >
@@ -341,7 +343,7 @@ export default function Sidebar({
             <div className="search-modal-header delete-modal-header">
               <h2 id="delete-chat-title" className="search-modal-title delete-modal-title">Delete Chat?</h2>
             </div>
-            
+
             <div className="search-modal-body delete-modal-body">
               <p className="delete-modal-text">Are you sure you want to delete this chat?</p>
               <div className="delete-modal-actions">
