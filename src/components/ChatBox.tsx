@@ -12,6 +12,22 @@ type Message = {
   agent_name?: string
 }
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+const scrubPII = (text: string) => {
+  if (!text) return text;
+  let scrubbed = text;
+  // Emails
+  scrubbed = scrubbed.replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g, '[REDACTED EMAIL]');
+  // Credit Cards
+  scrubbed = scrubbed.replace(/\b(?:\d{4}[-\s]?){3}\d{4}\b/g, '[REDACTED CC]');
+  // Phone Numbers
+  scrubbed = scrubbed.replace(/\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g, '[REDACTED PHONE]');
+  // SSNs
+  scrubbed = scrubbed.replace(/\b\d{3}[-\s]?\d{2}[-\s]?\d{4}\b/g, '[REDACTED SSN]');
+  return scrubbed;
+};
+
 export default function ChatHomeInput({
   newChatTrigger,
   activeSessionId,
@@ -34,6 +50,7 @@ export default function ChatHomeInput({
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null)
+  const [errorPopup, setErrorPopup] = useState<string | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const recognitionRef = useRef<any>(null)
@@ -137,26 +154,33 @@ export default function ChatHomeInput({
     if (!value.trim() && !selectedFile) return
 
     const userMessage = value
+    const scrubbedUserMessage = scrubPII(userMessage)
     setValue("")
+    setErrorPopup(null)
 
-    setMessages((prev) => {
-      const lastAgentName = [...prev].reverse().find(m => m.role === "assistant" && m.agent_name)?.agent_name || "LoanFit Copilot";
-      return [
-        ...prev,
-        {
-          role: "user",
-          content: userMessage,
-          file: selectedFile ? selectedFile.name : undefined
-        },
-        { role: "assistant", content: "", agent_name: lastAgentName }
-      ]
-    })
+    let uiUpdated = false;
+    const updateOptimisticUI = () => {
+      if (uiUpdated) return;
+      uiUpdated = true;
+      setMessages((prev) => {
+        const lastAgentName = [...prev].reverse().find(m => m.role === "assistant" && m.agent_name)?.agent_name || "LoanFit Copilot";
+        return [
+          ...prev,
+          {
+            role: "user",
+            content: scrubbedUserMessage,
+            file: selectedFile ? selectedFile.name : undefined
+          },
+          { role: "assistant", content: "", agent_name: lastAgentName }
+        ]
+      })
+    };
 
     try {
       const token = await getToken()
       const formData = new FormData()
 
-      formData.append("user_input", userMessage)
+      formData.append("user_input", scrubbedUserMessage)
 
       if (sessionId) {
         formData.append("session_id", sessionId)
@@ -166,7 +190,10 @@ export default function ChatHomeInput({
         formData.append("file", selectedFile)
       }
 
-      const response = await fetch("http://localhost:8000/api/chat", {
+      // Delay optimistic UI update slightly to check for instant 429s
+      const timeoutId = setTimeout(updateOptimisticUI, 150);
+
+      const response = await fetch(`${API_URL}/api/chat`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`
@@ -174,8 +201,20 @@ export default function ChatHomeInput({
         body: formData
       })
 
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          throw new Error("Rate limit exceeded. Please wait a minute before making more requests (limit: 30/min).");
+        }
+        throw new Error("Failed to send message.");
+      }
+
+      updateOptimisticUI();
+
       const newSessionId = response.headers.get("X-Session-ID")
       const agentName = response.headers.get("X-Agent-Name") || "Copilot"
+
       if (newSessionId && !sessionId) {
         setSessionId(newSessionId)
         if (onChatCreated) {
@@ -210,18 +249,12 @@ export default function ChatHomeInput({
         onChatUpdated()
       }
     } catch (error) {
-      setMessages((prev) => {
-        const lastAgentName = [...prev].reverse().find(m => m.role === "assistant" && m.agent_name)?.agent_name || "LoanFit Copilot";
-        return [
-          ...prev,
-          {
-            role: "user",
-            content: userMessage,
-            file: selectedFile?.name
-          },
-          { role: "assistant", content: "", agent_name: lastAgentName }
-        ]
-      })
+      const errorMessage = error instanceof Error ? error.message : "An error occurred.";
+      if (uiUpdated) {
+        setMessages((prev) => prev.slice(0, -2));
+      }
+      setValue(userMessage);
+      setErrorPopup(errorMessage);
     }
   }
 
@@ -244,6 +277,15 @@ export default function ChatHomeInput({
 
   return (
     <div className="chat-viewport">
+      {errorPopup && (
+        <div className="custom-error-popup">
+          <div className="custom-error-popup-content">
+            <span className="error-icon">⚠️</span>
+            <p>{errorPopup}</p>
+          </div>
+          <button className="custom-error-dismiss" type="button" onClick={() => setErrorPopup(null)} aria-label="Dismiss">✕</button>
+        </div>
+      )}
       <div className="chat-content">
         <div className="chat-column">
           <div className="chat-messages">
